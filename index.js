@@ -10,7 +10,6 @@ const pkg = require('./package.json');
 
 const defaultOptions = {
   url: 'amqp://localhost',
-  routing: 'topic',
   encoding: 'utf8',
   retry: {
     retries: 0,
@@ -19,6 +18,7 @@ const defaultOptions = {
     maxTimeout: Infinity,
     randomize: false
   },
+  useExistingConnection: false,
   preserveChannels: true,
   tuning: {},
   socket: {}

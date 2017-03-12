@@ -17,6 +17,7 @@ const config = {
     maxTimeout: Infinity,
     randomize: false
   },
+  useExistingConnection: false,
   preserveChannels: true,
   tuning: {},
   socket: {}
@@ -26,6 +27,7 @@ const config = {
 * `socket` options will be passed through to the underlying `amqp.connect`
 * `tuning` is an object that constructs the various RabbitMQ tuning query string params
 * `retry` affects the connection retry attempts using the underlying [retry](https://github.com/tim-kos/node-retry) module
+* `useExistingConnection` will return an existing default connection upon invocation of `createConnection`, useful if you have many plugins but want to just use a single connection. Defaults to `false`.
 * `preserveChannels` will keep around publish and push channels, minimizing request overhead, but potentially causing [issues](https://github.com/squaremo/amqp.node/issues/144), though none I've been able to replicate
 
 Additionally, all of the exposed methods take options that get passed to the underlying `amqplib` calls.
