@@ -1,0 +1,43 @@
+{
+  "name": "hapi-rabbitmq",
+  "version": "0.1.0",
+  "author": "Michael Shick <m@shick.us>",
+  "license": "MIT",
+  "description": "A HAPI server plugin implementing PubSub and work queue patterns in RabbitMQ with amqplib.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mshick/hapi-rabbitmq.git"
+  },
+  "engines": {
+    "node": ">=6.9.0"
+  },
+  "keywords": [
+    "hapi",
+    "rabbitmq",
+    "amqplib",
+    "pubsub",
+    "publish",
+    "subscribe",
+    "work-queue",
+    "worker",
+    "queue",
+    "task"
+  ],
+  "bugs": {
+    "url": "https://github.com/mshick/hapi-rabbitmq/issues"
+  },
+  "homepage": "https://github.com/mshick/hapi-rabbitmq#readme",
+  "dependencies": {
+    "amqplib": "^0.5.1",
+    "hoek": "^4.1.0",
+    "lodash.get": "^4.4.2",
+    "lodash.isempty": "^4.4.0",
+    "qs": "^6.4.0",
+    "retry": "^0.10.1",
+    "uuid": "^3.0.1"
+  }
+}
