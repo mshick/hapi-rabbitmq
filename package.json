@@ -1,6 +1,6 @@
 {
   "name": "hapi-rabbitmq",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Michael Shick <m@shick.us>",
   "license": "MIT",
   "description": "A HAPI server plugin implementing PubSub and work queue patterns in RabbitMQ with amqplib.",
@@ -39,5 +39,9 @@
     "qs": "^6.4.0",
     "retry": "^0.10.1",
     "uuid": "^3.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^3.17.1",
+    "eslint-config-xo-space": "^0.15.0"
   }
 }

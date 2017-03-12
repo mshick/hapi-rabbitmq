@@ -120,3 +120,10 @@ server.route({
 ## Promises
 
 This plugin works almost entirely via Promises. It was my use case, and I've found it to be the most sane approach to this sort of problem.
+
+## TODO
+
+* Add tests
+* Add fanout pattern
+* Add RPC pattern
+* Release 1.0
