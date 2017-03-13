@@ -24,31 +24,41 @@ const defaultOptions = {
   socket: {}
 };
 
+const initialState = {
+  _defaultConnection: null,
+  _openConnections: {},
+  _openChannels: {}
+};
+
 module.exports.register = function (plugin, userOptions, next) {
   const options = hoek.applyToDefaults(defaultOptions, userOptions);
 
   /* Tidy plugin */
-  const state = {
-    _defaultConnection: null,
-    _openConnections: {},
-    _openChannels: {}
-  };
+  let state;
 
-  plugin.app[pkg.name] = state;
+  const resetState = () => {
+    plugin.app[pkg.name] = hoek.applyToDefaults(initialState, {});
+    state = plugin.app[pkg.name];
+  };
 
   const closeAll = () => {
     let closingConnections = [];
-    let closingChannels = Object.keys(state._openChannels).map(channel => channel.channel.close());
+    let closingChannels = Object.keys(state._openChannels)
+      .map(channelName => {
+        return state._openChannels[channelName].channel.close();
+      });
 
     return Promise.all(closingChannels)
       .then(() => {
-        state._openChannels = [];
         closingChannels = [];
-        closingConnections = Object.keys(state._openConnections).map(conn => conn.close());
+        closingConnections = Object.keys(state._openConnections)
+          .map(connectionName => {
+            return state._openConnections[connectionName].close();
+          });
         return Promise.all(closingConnections);
       })
       .then(() => {
-        state._openConnections = [];
+        resetState();
         closingConnections = [];
       });
   };
