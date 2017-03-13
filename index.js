@@ -1,4 +1,4 @@
-const hoek = require('hoek');
+const applyToDefaults = require('hoek').applyToDefaults;
 const createConnection = require('./lib/create-connection');
 const createChannel = require('./lib/create-channel');
 const pushTask = require('./lib/push-task');
@@ -31,13 +31,13 @@ const initialState = {
 };
 
 module.exports.register = function (plugin, userOptions, next) {
-  const options = hoek.applyToDefaults(defaultOptions, userOptions);
+  const options = applyToDefaults(defaultOptions, userOptions || {});
 
   /* Tidy plugin */
   let state;
 
   const resetState = () => {
-    plugin.app[pkg.name] = hoek.applyToDefaults(initialState, {});
+    plugin.app[pkg.name] = applyToDefaults(initialState, {});
     state = plugin.app[pkg.name];
   };
 
