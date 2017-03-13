@@ -41,6 +41,8 @@ module.exports.register = function (plugin, userOptions, next) {
     state = plugin.app[pkg.name];
   };
 
+  resetState();
+
   const closeAll = () => {
     let closingConnections = [];
     let closingChannels = Object.keys(state._openChannels)
