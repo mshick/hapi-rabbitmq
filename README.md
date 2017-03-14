@@ -30,8 +30,8 @@ const config = {
     maxTimeout: 60 * 1000,
     maxLength: 10000
   },
-  failQueue: {
-    suffix: '_fail',
+  doneQueue: {
+    suffix: '_done',
     maxLength: 10000
   }
 };
@@ -109,7 +109,7 @@ const worker = function ({payload}) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       console.log(' [x] Done');
-      resolve(rabbitmq.constants.ACK);
+      resolve({code: rabbitmq.constants.ACK});
     }, secs * 1000);
   });
 };
@@ -146,6 +146,7 @@ This plugin works almost entirely via Promises. It was my use case, and I've fou
 
 ## TODO
 
+* Handle queue assertion failures
 * Add tests
 * Add fanout pattern
 * Add RPC pattern

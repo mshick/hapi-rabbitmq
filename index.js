@@ -32,8 +32,8 @@ const defaultOptions = {
     maxTimeout: 60 * 1000,
     maxLength: 10000
   },
-  failQueue: {
-    suffix: '_fail',
+  doneQueue: {
+    suffix: '_done',
     maxLength: 10000
   }
 };
