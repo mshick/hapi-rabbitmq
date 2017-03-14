@@ -27,10 +27,12 @@ const config = {
     maxCount: 10,
     factor: 2,
     minTimeout: 1 * 1000,
-    maxTimeout: 60 * 1000
+    maxTimeout: 60 * 1000,
+    maxLength: 10000
   },
   failQueue: {
-    suffix: '_fail'
+    suffix: '_fail',
+    maxLength: 10000
   }
 };
 ```
