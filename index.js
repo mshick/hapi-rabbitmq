@@ -6,22 +6,34 @@ const addWorker = require('./lib/add-worker');
 const publishMessage = require('./lib/publish-message');
 const addSubscriber = require('./lib/add-subscriber');
 const getChannelName = require('./lib/get-channel-name');
+const constants = require('./lib/constants');
 const pkg = require('./package.json');
 
 const defaultOptions = {
   url: 'amqp://localhost',
-  encoding: 'utf8',
-  retry: {
-    retries: 0,
-    factor: 2,
-    minTimeout: 1000,
-    maxTimeout: Infinity,
-    randomize: false
-  },
-  useExistingConnection: false,
   preserveChannels: true,
-  tuning: {},
-  socket: {}
+  connection: {
+    socket: {},
+    tuning: {},
+    retry: {
+      retries: 0,
+      factor: 2,
+      minTimeout: 1000,
+      maxTimeout: Infinity,
+      randomize: false
+    },
+    useExisting: false
+  },
+  retryQueue: {
+    suffix: '_retry',
+    maxCount: 10,
+    factor: 2,
+    minTimeout: 1 * 1000,
+    maxTimeout: 60 * 1000
+  },
+  failQueue: {
+    suffix: '_fail'
+  }
 };
 
 const initialState = {
@@ -98,6 +110,9 @@ module.exports.register = function (plugin, userOptions, next) {
 
   /* Utils */
   plugin.expose('getChannelName', getChannelName);
+
+  /* Constants */
+  plugin.expose('constants', constants);
 
   next();
 };

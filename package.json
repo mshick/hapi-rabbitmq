@@ -36,6 +36,7 @@
     "hoek": "^4.1.0",
     "lodash.get": "^4.4.2",
     "lodash.isempty": "^4.4.0",
+    "lodash.isundefined": "^3.0.1",
     "qs": "^6.4.0",
     "retry": "^0.10.1",
     "uuid": "^3.0.1"

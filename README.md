@@ -9,18 +9,29 @@ The plugin supports the following configuration (defaults shown):
 ```js
 const config = {
   url: 'amqp://localhost',
-  encoding: 'utf8',
-  retry: {
-    retries: 0,
-    factor: 2,
-    minTimeout: 1000,
-    maxTimeout: Infinity,
-    randomize: false
-  },
-  useExistingConnection: false,
   preserveChannels: true,
-  tuning: {},
-  socket: {}
+  connection: {
+    socket: {},
+    tuning: {},
+    retry: {
+      retries: 0,
+      factor: 2,
+      minTimeout: 1000,
+      maxTimeout: Infinity,
+      randomize: false
+    },
+    useExisting: false
+  },
+  retryQueue: {
+    suffix: '_retry',
+    maxCount: 10,
+    factor: 2,
+    minTimeout: 1 * 1000,
+    maxTimeout: 60 * 1000
+  },
+  failQueue: {
+    suffix: '_fail'
+  }
 };
 ```
 
@@ -29,6 +40,8 @@ const config = {
 * `retry` affects the connection retry attempts using the underlying [retry](https://github.com/tim-kos/node-retry) module
 * `useExistingConnection` will return an existing default connection upon invocation of `createConnection`, useful if you have many plugins but want to just use a single connection. Defaults to `false`.
 * `preserveChannels` will keep around publish and push channels, minimizing request overhead, but potentially causing [issues](https://github.com/squaremo/amqp.node/issues/144), though none I've been able to replicate
+* `retryQueue` implements a [retry queue with exponential backoff](https://felipeelias.github.io/rabbitmq/2016/02/22/rabbitmq-exponential-backoff.html) and is enabled by default for work queues
+* `failQueue` is where things go when they fall out of the retry queue
 
 Additionally, all of the exposed methods take options that get passed to the underlying `amqplib` calls.
 
@@ -46,8 +59,10 @@ PubSub:
 
 const rabbitmq = server.plugins['hapi-rabbitmq'];
 
-const subscriber = function ({message, content, channel}) {
-  console.log(' [x] Received \'%s\'', content);
+const subscriber = function ({payload}) {
+  return new Promise(resolve => {
+    console.log(' [x] Received \'%s\'', content);
+  });
 };
 
 rabbitmq.createConnection()
@@ -68,7 +83,7 @@ server.route({
     rabbitmq.publishMessage({
       exchange: 'pubsub',
       topic: 'request',
-      data: request.payload
+      payload: request.payload
     })
     .then(() => reply('ok'))
     .catch(reply);
@@ -84,14 +99,17 @@ Work queue:
 
 const rabbitmq = server.plugins['hapi-rabbitmq'];
 
-const worker = function ({message, content, channel}) {
+const worker = function ({payload}) {
   const secs = 10;
-  console.log(' [x] Received \'%s\'', content);
+  console.log(' [x] Received payload', content);
+  console.log(payload);
   console.log(' [x] Task takes %d seconds', secs);
-  setTimeout(() => {
-    console.log(' [x] Done');
-    channel.ack(message);
-  }, secs * 1000);
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      console.log(' [x] Done');
+      resolve(rabbitmq.constants.ACK);
+    }, secs * 1000);
+  });
 };
 
 rabbitmq.createConnection()
@@ -111,7 +129,8 @@ server.route({
     rabbitmq
       .pushTask({
         queue: 'work',
-        data: request.payload
+        type: 'foo',
+        payload: request.payload
       })
       .then(() => reply('ok'))
       .catch(reply);
