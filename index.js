@@ -84,7 +84,7 @@ module.exports.register = function (plugin, userOptions, next) {
     closeAll().then(() => next()).catch(next);
   });
 
-  const handlerOptions = {options, state, name: pkg.name, log: plugin.log};
+  const handlerOptions = {options, state, name: pkg.name, server: plugin};
 
   /* Initialization */
   plugin.expose('createConnection', args => {
