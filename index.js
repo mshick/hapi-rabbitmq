@@ -76,6 +76,7 @@ module.exports.register = function (plugin, userOptions, next) {
       .then(() => {
         resetState();
         closingConnections = [];
+        plugin.log(['info', pkg.name], 'connections closed');
       });
   };
 
@@ -83,31 +84,33 @@ module.exports.register = function (plugin, userOptions, next) {
     closeAll().then(() => next()).catch(next);
   });
 
+  const handlerOptions = {options, state, name: pkg.name, log: plugin.log};
+
   /* Initialization */
   plugin.expose('createConnection', args => {
-    return createConnection(args, {options, state});
+    return createConnection(args, handlerOptions);
   });
 
   plugin.expose('createChannel', args => {
-    return createChannel(args, {options, state});
+    return createChannel(args, handlerOptions);
   });
 
   /* Work queue */
   plugin.expose('pushTask', args => {
-    return pushTask(args, {options, state});
+    return pushTask(args, handlerOptions);
   });
 
   plugin.expose('addWorker', args => {
-    return addWorker(args, {options, state});
+    return addWorker(args, handlerOptions);
   });
 
   /* PubSub */
   plugin.expose('publishMessage', args => {
-    return publishMessage(args, {options, state});
+    return publishMessage(args, handlerOptions);
   });
 
   plugin.expose('addSubscriber', args => {
-    return addSubscriber(args, {options, state});
+    return addSubscriber(args, handlerOptions);
   });
 
   /* Utils */
