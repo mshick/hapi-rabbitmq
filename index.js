@@ -88,11 +88,25 @@ module.exports.register = function (plugin, userOptions, next) {
 
   /* Initialization */
   plugin.expose('createConnection', args => {
-    return createConnection(args, handlerOptions);
+    return createConnection(args, handlerOptions)
+      .then(result => {
+        plugin.log(['info', 'connection', pkg.name], 'connection created');
+        return result;
+      })
+      .catch(error => {
+        plugin.log(['error', 'connection', pkg.name], error);
+      });
   });
 
   plugin.expose('createChannel', args => {
-    return createChannel(args, handlerOptions);
+    return createChannel(args, handlerOptions)
+      .then(result => {
+        plugin.log(['info', 'channel', pkg.name], 'channel created');
+        return result;
+      })
+      .catch(error => {
+        plugin.log(['error', 'channel', pkg.name], error);
+      });
   });
 
   /* Work queue */
@@ -101,7 +115,14 @@ module.exports.register = function (plugin, userOptions, next) {
   });
 
   plugin.expose('addWorker', args => {
-    return addWorker(args, handlerOptions);
+    return addWorker(args, handlerOptions)
+      .then(result => {
+        plugin.log(['info', 'worker', pkg.name], `worker added ${args.queue}`);
+        return result;
+      })
+      .catch(error => {
+        plugin.log(['error', 'worker', pkg.name], error);
+      });
   });
 
   /* PubSub */
@@ -110,7 +131,14 @@ module.exports.register = function (plugin, userOptions, next) {
   });
 
   plugin.expose('addSubscriber', args => {
-    return addSubscriber(args, handlerOptions);
+    return addSubscriber(args, handlerOptions)
+      .then(result => {
+        plugin.log(['info', 'subscriber', pkg.name], `subscriber added ${args.exchange}`);
+        return result;
+      })
+      .catch(error => {
+        plugin.log(['error', 'subscriber', pkg.name], error);
+      });
   });
 
   /* Utils */
