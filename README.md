@@ -43,7 +43,7 @@ const config = {
 * `useExistingConnection` will return an existing default connection upon invocation of `createConnection`, useful if you have many plugins but want to just use a single connection. Defaults to `false`.
 * `preserveChannels` will keep around publish and push channels, minimizing request overhead, but potentially causing [issues](https://github.com/squaremo/amqp.node/issues/144), though none I've been able to replicate
 * `retryQueue` implements a [retry queue with exponential backoff](https://felipeelias.github.io/rabbitmq/2016/02/22/rabbitmq-exponential-backoff.html) and is enabled by default for work queues
-* `failQueue` is where things go when they fall out of the retry queue
+* `doneQueue` can write finished jobs to a final queue. Defaults to `false`, because it seems like an odd pattern. You're probably better off writing to your own db.
 
 Additionally, all of the exposed methods take options that get passed to the underlying `amqplib` calls.
 
