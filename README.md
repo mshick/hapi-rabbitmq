@@ -37,10 +37,10 @@ const config = {
 };
 ```
 
-* `socket` options will be passed through to the underlying `amqp.connect`
-* `tuning` is an object that constructs the various RabbitMQ tuning query string params
-* `retry` affects the connection retry attempts using the underlying [retry](https://github.com/tim-kos/node-retry) module
-* `useExistingConnection` will return an existing default connection upon invocation of `createConnection`, useful if you have many plugins but want to just use a single connection. Defaults to `false`.
+* `connection.socket` options will be passed through to the underlying `amqp.connect`
+* `connection.tuning` is an object that constructs the various RabbitMQ tuning query string params
+* `connection.retry` affects the connection retry attempts using the underlying [retry](https://github.com/tim-kos/node-retry) module
+* `connection.useExisting` will return an existing default connection upon invocation of `createConnection`, useful if you have many plugins but want to just use a single connection. Defaults to `false`.
 * `preserveChannels` will keep around publish and push channels, minimizing request overhead, but potentially causing [issues](https://github.com/squaremo/amqp.node/issues/144), though none I've been able to replicate
 * `retryQueue` implements a [retry queue with exponential backoff](https://felipeelias.github.io/rabbitmq/2016/02/22/rabbitmq-exponential-backoff.html) and is enabled by default for work queues
 * `doneQueue` can write finished jobs to a final queue. Defaults to `false`, because it seems like an odd pattern. You're probably better off writing to your own db.
@@ -59,7 +59,7 @@ PubSub:
 
 // Register plugin... start server
 
-const rabbitmq = server.plugins['hapi-rabbitmq'];
+const {rabbitmq} = server.methods;
 
 const subscriber = function ({payload}) {
   return new Promise(resolve => {
@@ -99,7 +99,8 @@ Work queue:
 
 // Register plugin... start server
 
-const rabbitmq = server.plugins['hapi-rabbitmq'];
+const {rabbitmq} = server.plugins;
+const {ACK} = server.plugins['hapi-rabbitmq'].constants;
 
 const worker = function ({payload}) {
   const secs = 10;
@@ -109,7 +110,7 @@ const worker = function ({payload}) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       console.log(' [x] Done');
-      resolve({code: rabbitmq.constants.ACK});
+      resolve({code: ACK});
     }, secs * 1000);
   });
 };
