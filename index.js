@@ -9,6 +9,8 @@ const getChannelName = require('./lib/get-channel-name');
 const constants = require('./lib/constants');
 const pkg = require('./package.json');
 
+const SHORT_NAME = pkg.name.replace('hapi-', '');
+
 const defaultOptions = {
   url: 'amqp://localhost',
   preserveChannels: true,
@@ -73,7 +75,7 @@ module.exports.register = function (plugin, userOptions, next) {
       .then(() => {
         resetState();
         closingConnections = [];
-        plugin.log(['info', pkg.name], 'connections closed');
+        plugin.log([pkg.name], 'connections closed');
       });
   };
 
@@ -87,11 +89,12 @@ module.exports.register = function (plugin, userOptions, next) {
   plugin.expose('createConnection', args => {
     return createConnection(args, handlerOptions)
       .then(result => {
-        plugin.log(['info', 'connection', pkg.name], 'connection created');
+        plugin.log(['connection', pkg.name], 'connection created');
         return result;
       })
       .catch(error => {
         plugin.log(['error', 'connection', pkg.name], error);
+        throw error;
       });
   });
 
@@ -103,6 +106,31 @@ module.exports.register = function (plugin, userOptions, next) {
       })
       .catch(error => {
         plugin.log(['error', 'channel', pkg.name], error);
+        throw error;
+      });
+  });
+
+  plugin.method(`${SHORT_NAME}.createConnection`, args => {
+    return createConnection(args, handlerOptions)
+      .then(result => {
+        plugin.log(['info', 'connection', pkg.name], 'connection created');
+        return result;
+      })
+      .catch(error => {
+        plugin.log(['error', 'connection', pkg.name], error);
+        throw error;
+      });
+  });
+
+  plugin.method(`${SHORT_NAME}.createChannel`, args => {
+    return createChannel(args, handlerOptions)
+      .then(result => {
+        plugin.log(['info', 'channel', pkg.name], 'channel created');
+        return result;
+      })
+      .catch(error => {
+        plugin.log(['error', 'channel', pkg.name], error);
+        throw error;
       });
   });
 
@@ -114,11 +142,28 @@ module.exports.register = function (plugin, userOptions, next) {
   plugin.expose('addWorker', args => {
     return addWorker(args, handlerOptions)
       .then(result => {
-        plugin.log(['info', 'worker', pkg.name], `worker added ${args.queue}`);
+        plugin.log(['worker', pkg.name], `worker added ${args.queue}`);
         return result;
       })
       .catch(error => {
         plugin.log(['error', 'worker', pkg.name], error);
+        throw error;
+      });
+  });
+
+  plugin.method(`${SHORT_NAME}.pushTask`, args => {
+    return pushTask(args, handlerOptions);
+  });
+
+  plugin.method(`${SHORT_NAME}.addWorker`, args => {
+    return addWorker(args, handlerOptions)
+      .then(result => {
+        plugin.log(['worker', pkg.name], `worker added ${args.queue}`);
+        return result;
+      })
+      .catch(error => {
+        plugin.log(['error', 'worker', pkg.name], error);
+        throw error;
       });
   });
 
@@ -127,19 +172,37 @@ module.exports.register = function (plugin, userOptions, next) {
     return publishMessage(args, handlerOptions);
   });
 
+  plugin.method(`${SHORT_NAME}.publishMessage`, args => {
+    return publishMessage(args, handlerOptions);
+  });
+
   plugin.expose('addSubscriber', args => {
     return addSubscriber(args, handlerOptions)
       .then(result => {
-        plugin.log(['info', 'subscriber', pkg.name], `subscriber added ${args.exchange}`);
+        plugin.log(['subscriber', pkg.name], `subscriber added ${args.exchange}`);
         return result;
       })
       .catch(error => {
         plugin.log(['error', 'subscriber', pkg.name], error);
+        throw error;
+      });
+  });
+
+  plugin.method(`${SHORT_NAME}.addSubscriber`, args => {
+    return addSubscriber(args, handlerOptions)
+      .then(result => {
+        plugin.log(['subscriber', pkg.name], `subscriber added ${args.exchange}`);
+        return result;
+      })
+      .catch(error => {
+        plugin.log(['error', 'subscriber', pkg.name], error);
+        throw error;
       });
   });
 
   /* Utils */
   plugin.expose('getChannelName', getChannelName);
+  plugin.method(`${SHORT_NAME}.getChannelName`, getChannelName);
 
   /* Constants */
   plugin.expose('constants', constants);
