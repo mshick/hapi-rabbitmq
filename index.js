@@ -86,29 +86,6 @@ module.exports.register = function (plugin, userOptions, next) {
   const handlerOptions = {options, state, name: pkg.name, server: plugin};
 
   /* Initialization */
-  plugin.expose('createConnection', args => {
-    return createConnection(args, handlerOptions)
-      .then(result => {
-        plugin.log(['connection', pkg.name], 'connection created');
-        return result;
-      })
-      .catch(error => {
-        plugin.log(['error', 'connection', pkg.name], error);
-        throw error;
-      });
-  });
-
-  plugin.expose('createChannel', args => {
-    return createChannel(args, handlerOptions)
-      .then(result => {
-        plugin.log(['info', 'channel', pkg.name], 'channel created');
-        return result;
-      })
-      .catch(error => {
-        plugin.log(['error', 'channel', pkg.name], error);
-        throw error;
-      });
-  });
 
   plugin.method(`${SHORT_NAME}.createConnection`, args => {
     return createConnection(args, handlerOptions)
@@ -135,21 +112,6 @@ module.exports.register = function (plugin, userOptions, next) {
   });
 
   /* Work queue */
-  plugin.expose('pushTask', args => {
-    return pushTask(args, handlerOptions);
-  });
-
-  plugin.expose('addWorker', args => {
-    return addWorker(args, handlerOptions)
-      .then(result => {
-        plugin.log(['worker', pkg.name], `worker added ${args.queue}`);
-        return result;
-      })
-      .catch(error => {
-        plugin.log(['error', 'worker', pkg.name], error);
-        throw error;
-      });
-  });
 
   plugin.method(`${SHORT_NAME}.pushTask`, args => {
     return pushTask(args, handlerOptions);
@@ -168,24 +130,9 @@ module.exports.register = function (plugin, userOptions, next) {
   });
 
   /* PubSub */
-  plugin.expose('publishMessage', args => {
-    return publishMessage(args, handlerOptions);
-  });
 
   plugin.method(`${SHORT_NAME}.publishMessage`, args => {
     return publishMessage(args, handlerOptions);
-  });
-
-  plugin.expose('addSubscriber', args => {
-    return addSubscriber(args, handlerOptions)
-      .then(result => {
-        plugin.log(['subscriber', pkg.name], `subscriber added ${args.exchange}`);
-        return result;
-      })
-      .catch(error => {
-        plugin.log(['error', 'subscriber', pkg.name], error);
-        throw error;
-      });
   });
 
   plugin.method(`${SHORT_NAME}.addSubscriber`, args => {
@@ -201,7 +148,6 @@ module.exports.register = function (plugin, userOptions, next) {
   });
 
   /* Utils */
-  plugin.expose('getChannelName', getChannelName);
   plugin.method(`${SHORT_NAME}.getChannelName`, getChannelName);
 
   /* Constants */
