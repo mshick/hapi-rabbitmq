@@ -1,12 +1,13 @@
 const applyToDefaults = require('hoek').applyToDefaults;
-const createConnection = require('./lib/create-connection');
-const createChannel = require('./lib/create-channel');
-const pushTask = require('./lib/push-task');
-const addWorker = require('./lib/add-worker');
-const publishMessage = require('./lib/publish-message');
-const addSubscriber = require('./lib/add-subscriber');
-const getChannelName = require('./lib/get-channel-name');
-const constants = require('./lib/constants');
+const {
+  constants,
+  createConnection,
+  closeConnection,
+  addSubscriber,
+  publishMessage,
+  addWorker,
+  pushTask
+} = requie('librabbitmq');
 const pkg = require('./package.json');
 
 const SHORT_NAME = pkg.name.replace('hapi-', '');

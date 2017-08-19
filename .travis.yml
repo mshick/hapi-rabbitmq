@@ -1,0 +1,10 @@
+env:
+  - RABBITMQ_USER=guest RABBITMQ_PASSWORD=guest
+sudo: required
+language: node_js
+cache: yarn
+services:
+  - rabbitmq
+node_js:
+  - 6
+  - 8

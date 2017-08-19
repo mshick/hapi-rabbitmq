@@ -6,14 +6,14 @@
   "description": "A HAPI server plugin implementing PubSub and work queue patterns in RabbitMQ with amqplib.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --require dotenv/config node_modules/.bin/ava"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/mshick/hapi-rabbitmq.git"
   },
   "engines": {
-    "node": ">=6.9.0"
+    "node": ">=6.0.0"
   },
   "keywords": [
     "hapi",
@@ -32,17 +32,18 @@
   },
   "homepage": "https://github.com/mshick/hapi-rabbitmq#readme",
   "dependencies": {
-    "amqplib": "^0.5.1",
+    "ajv": "^5.1.1",
     "hoek": "^4.1.0",
-    "lodash.get": "^4.4.2",
-    "lodash.isempty": "^4.4.0",
-    "lodash.isundefined": "^3.0.1",
-    "qs": "^6.4.0",
-    "retry": "^0.10.1",
-    "uuid": "^3.0.1"
+    "libpiggy": "^0.2.0"
   },
   "devDependencies": {
-    "eslint": "^3.17.1",
-    "eslint-config-xo-space": "^0.15.0"
-  }
+    "ava": "^0.21.0",
+    "babel-eslint": "^7.2.3",
+    "dotenv": "^4.0.0",
+    "eslint": "^4.3.0",
+    "eslint-config-parsley": "^1.2.1",
+    "eslint-plugin-filenames": "^1.2.0",
+    "eslint-plugin-import": "^2.7.0",
+    "hapi": "^16.1.1"
+  },
 }
