@@ -2164,8 +2164,8 @@ levn@^0.3.0, levn@~0.3.0:
     type-check "~0.3.2"
 
 librabbitmq@^0.7.0:
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/librabbitmq/-/librabbitmq-0.7.0.tgz#dd204c827ed352c6d10ac6e75b0f19fd9a31ec10"
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/librabbitmq/-/librabbitmq-0.7.1.tgz#1d86cfd744d444561f379016401ec9ed02f67b81"
   dependencies:
     amqplib "^0.5.1"
     lodash "^4.4.2"

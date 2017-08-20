@@ -1,7 +1,7 @@
 hapi-rabbitmq [![Build Status](https://travis-ci.org/mshick/hapi-rabbitmq.svg?branch=master)](https://travis-ci.org/mshick/hapi-rabbitmq) [![npm version](https://badge.fury.io/js/hapi-rabbitmq.svg)](https://badge.fury.io/js/hapi-rabbitmq)
 ==============
 
-A HAPI server plugin exposing RabbitMQ-backed PubSub and job queue pattern methods from [librabbitmq](https://github.com/librabbitmq/).
+A HAPI server plugin exposing RabbitMQ-backed PubSub and task queue pattern methods from [librabbitmq](https://github.com/librabbitmq/).
 
 Configuration
 -------------
@@ -75,7 +75,7 @@ server.route({
 });
 ```
 
-### Job queue
+### Task queue
 
 ```js
 
@@ -84,10 +84,10 @@ server.route({
 const {rabbitmq} = server.plugins;
 const {ACK} = server.plugins['hapi-rabbitmq'].constants;
 
-const worker = function (job) {
+const worker = function (task) {
   return new Promise(resolve => {
     setTimeout(() => {
-      console.log(job.payload);
+      console.log(task.payload);
       resolve(ACK);
     }, 1000);
   });
