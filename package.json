@@ -3,7 +3,7 @@
   "version": "0.6.1",
   "author": "Michael Shick <m@shick.us>",
   "license": "MIT",
-  "description": "A HAPI server plugin implementing PubSub and work queue patterns in RabbitMQ with amqplib.",
+  "description": "A HAPI server plugin implementing PubSub and job queue patterns in RabbitMQ with librabbitmq.",
   "main": "index.js",
   "scripts": {
     "test": "node --require dotenv/config node_modules/.bin/ava"
@@ -33,8 +33,8 @@
   "homepage": "https://github.com/mshick/hapi-rabbitmq#readme",
   "dependencies": {
     "ajv": "^5.1.1",
-    "hoek": "^4.1.0",
-    "libpiggy": "^0.2.0"
+    "librabbitmq": "^0.2.0",
+    "lodash": "^4.17.4"
   },
   "devDependencies": {
     "ava": "^0.21.0",
@@ -45,5 +45,5 @@
     "eslint-plugin-filenames": "^1.2.0",
     "eslint-plugin-import": "^2.7.0",
     "hapi": "^16.1.1"
-  },
+  }
 }

@@ -1,8 +1,9 @@
 import test from 'ava';
 import {Server} from 'hapi';
+import pkg from '../package.json';
 
-const {POSTGRES_USER, POSTGRES_DB} = process.env;
-const PG_URL = `postgresql://${POSTGRES_USER}@localhost/${POSTGRES_DB}`;
+const {RABBITMQ_USER, RABBITMQ_PASSWORD} = process.env;
+const RABBITMQ_URL = `amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@localhost/`;
 
 let server;
 
@@ -42,21 +43,21 @@ test.cb('should be able to register plugin with just URL', t => {
   server.register({
     register: require('../'),
     options: {
-      url: 'postgresql://localhost/db'
+      url: RABBITMQ_URL
     }
   }, t.end);
 });
 
 test.cb('should log upon registration', t => {
   server.once('log', entry => {
-    t.is(entry.data, 'hapi-piggy registered');
+    t.is(entry.data, 'hapi-rabbitmq registered');
     t.end();
   });
 
   server.register({
     register: require('../'),
     options: {
-      url: 'postgresql://localhost/db'
+      url: RABBITMQ_URL
     }
   }, err => {
     if (err) {
@@ -70,7 +71,7 @@ test.cb('should be able to find the plugin exposed methods', t => {
   server.register({
     register: require('../'),
     options: {
-      url: 'mongodb://localhost:27017'
+      url: RABBITMQ_URL
     }
   }, err => {
     if (err) {
@@ -78,32 +79,27 @@ test.cb('should be able to find the plugin exposed methods', t => {
       return t.end();
     }
 
-    const methods = server.methods.piggy;
+    const methods = server.methods.rabbitmq;
 
     t.truthy(methods.createConnection);
     t.truthy(methods.closeConnection);
-    t.truthy(methods.createPool);
-    t.truthy(methods.createClient);
-    t.truthy(methods.tableExists);
-    t.truthy(methods.getTableColumns);
-    t.truthy(methods.watchTable);
-    t.truthy(methods.createStore);
-    t.truthy(methods.set);
-    t.truthy(methods.del);
-    t.truthy(methods.get);
-    t.truthy(methods.mget);
-    t.truthy(methods.upsert);
+    t.truthy(methods.createChannel);
+    t.truthy(methods.pushTask);
+    t.truthy(methods.addWorker);
+    t.truthy(methods.publishMessage);
+    t.truthy(methods.addSubscriber);
+    t.truthy(methods.getChannelName);
 
     t.end();
   });
 });
 
-if (PG_URL) {
-  test('should be able to connect to the database and clean up after itself', async t => {
+if (RABBITMQ_URL) {
+  test('should be able to connect to rabbitmq and clean up after itself', async t => {
     const err = await server.registerPromise({
       register: require('../'),
       options: {
-        url: PG_URL
+        url: RABBITMQ_URL
       }
     });
 
@@ -111,22 +107,17 @@ if (PG_URL) {
       return t.fail();
     }
 
-    const state = server.app['hapi-piggy'];
+    const state = server.app[pkg.name];
 
-    const {piggy} = server.methods;
+    const {rabbitmq} = server.methods;
 
-    const client = await piggy.createConnection();
+    await rabbitmq.createConnection();
 
-    t.is(Object.keys(state.openPools).length, 1);
-    t.is(state.openClients.length, 1);
+    t.is(Object.keys(state._openConnections).length, 1);
 
-    client.close();
+    await rabbitmq.closeConnection();
 
-    t.is(state.openClients.length, 0);
-
-    await piggy.closeConnection();
-
-    t.is(Object.keys(state.openPools).length, 0);
+    t.is(Object.keys(state._openConnections).length, 0);
 
     t.pass();
   });
