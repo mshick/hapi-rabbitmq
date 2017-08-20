@@ -1,59 +1,41 @@
-# hapi-rabbitmq
+hapi-rabbitmq [![Build Status](https://travis-ci.org/mshick/hapi-rabbitmq.svg?branch=master)](https://travis-ci.org/mshick/hapi-rabbitmq) [![npm version](https://badge.fury.io/js/hapi-rabbitmq.svg)](https://badge.fury.io/js/hapi-rabbitmq)
+==============
 
-A HAPI server plugin implementing PubSub and work queue patterns in RabbitMQ with [amqplib](http://squaremo.github.io/amqp.node/).
+A HAPI server plugin exposing RabbitMQ-backed PubSub and job queue pattern methods from [librabbitmq](https://github.com/librabbitmq/).
 
-## Configuration
+Configuration
+-------------
 
-The plugin supports the following configuration (defaults shown):
+The only required config is the url for your RabbitMQ server:
 
 ```js
-const config = {
-  url: 'amqp://localhost',
-  preserveChannels: true,
-  connection: {
-    socket: {},
-    tuning: {},
-    retry: {
-      retries: 0,
-      factor: 2,
-      minTimeout: 1000,
-      maxTimeout: Infinity,
-      randomize: false
-    },
-    useExisting: false
-  },
-  retryQueue: {
-    suffix: '_retry',
-    maxCount: 10,
-    factor: 2,
-    minTimeout: 1 * 1000,
-    maxTimeout: 60 * 1000,
-    maxLength: 10000
-  },
-  doneQueue: {
-    suffix: '_done',
-    maxLength: 10000
+server.register({
+  register: require('hapi-rabbitmq'),
+  options: {
+    url: 'amqp://localhost'
   }
-};
+});
 ```
 
-* `connection.socket` options will be passed through to the underlying `amqp.connect`
-* `connection.tuning` is an object that constructs the various RabbitMQ tuning query string params
-* `connection.retry` affects the connection retry attempts using the underlying [retry](https://github.com/tim-kos/node-retry) module
-* `connection.useExisting` will return an existing default connection upon invocation of `createConnection`, useful if you have many plugins but want to just use a single connection. Defaults to `false`.
-* `preserveChannels` will keep around publish and push channels, minimizing request overhead, but potentially causing [issues](https://github.com/squaremo/amqp.node/issues/144), though none I've been able to replicate
-* `retryQueue` implements a [retry queue with exponential backoff](https://felipeelias.github.io/rabbitmq/2016/02/22/rabbitmq-exponential-backoff.html) and is enabled by default for work queues
-* `doneQueue` can write finished jobs to a final queue. Defaults to `false`, because it seems like an odd pattern. You're probably better off writing to your own db.
+This plugin sets two notable defaults, intended to give good results on a HAPI server, where you are probably registering many decoupled plugins, and probably might not know which first set up your RabbitMQ connection.
 
-Additionally, all of the exposed methods take options that get passed to the underlying `amqplib` calls.
+```js
+{
+  preserveChannels: true,
+  connection: {
+    useExisting: true
+  }
+}
+```
 
-## Usage
+There are many more configuration options which are passed through to librabbitmq. [Read more about them](https://github.com/mshick/librabbitmq#configuration).
+
+Usage
+-----
 
 Generally speaking, you only need to create a connection once, and that will be reused for all of your channel creation. You do have the option of creating multiple connections and passing those to the methods that create channels, if you need greater control.
 
-Below are the easiest examples.
-
-PubSub:
+### PubSub
 
 ```js
 
@@ -61,9 +43,9 @@ PubSub:
 
 const {rabbitmq} = server.methods;
 
-const subscriber = function ({payload}) {
-  return new Promise(resolve => {
-    console.log(' [x] Received \'%s\'', content);
+const subscriber = function (message) {
+  return new Promise(() => {
+    console.log('Message: ', message.payload);
   });
 };
 
@@ -93,7 +75,7 @@ server.route({
 });
 ```
 
-Work queue:
+### Job queue
 
 ```js
 
@@ -102,16 +84,12 @@ Work queue:
 const {rabbitmq} = server.plugins;
 const {ACK} = server.plugins['hapi-rabbitmq'].constants;
 
-const worker = function ({payload}) {
-  const secs = 10;
-  console.log(' [x] Received payload', content);
-  console.log(payload);
-  console.log(' [x] Task takes %d seconds', secs);
-  return new Promise((resolve, reject) => {
+const worker = function (job) {
+  return new Promise(resolve => {
     setTimeout(() => {
-      console.log(' [x] Done');
-      resolve({code: ACK});
-    }, secs * 1000);
+      console.log(job.payload);
+      resolve(ACK);
+    }, 1000);
   });
 };
 
@@ -141,14 +119,8 @@ server.route({
 });
 ```
 
-## Promises
+Requirements
+------------
 
-This plugin works almost entirely via Promises. It was my use case, and I've found it to be the most sane approach to this sort of problem.
-
-## TODO
-
-* Handle queue assertion failures
-* Add tests
-* Add fanout pattern
-* Add RPC pattern
-* Release 1.0
+*   node.js >= 6.0
+*   RabbitMQ 3.6.11 (only version tested)

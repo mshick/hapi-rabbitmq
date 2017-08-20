@@ -81,14 +81,14 @@ const validate = ajv.compile(optionsSchema);
 const defaultOptions = {
   preserveChannels: true,
   connection: {
+    useExisting: true,
     retry: {
       retries: 0,
       factor: 2,
       minTimeout: 1000,
       maxTimeout: Infinity,
       randomize: false
-    },
-    useExisting: false
+    }
   }
 };
 
@@ -122,39 +122,15 @@ exports.register = function (server, userOptions, next) {
   /* Initialization */
 
   server.method(`${SHORT_NAME}.createConnection`, args => {
-    return createConnection(args, handlerOptions)
-      .then(result => {
-        server.log(['info', 'connection', pkg.name], 'connection created');
-        return result;
-      })
-      .catch(error => {
-        server.log(['error', 'connection', pkg.name], error);
-        throw error;
-      });
+    return createConnection(args, handlerOptions);
   });
 
   server.method(`${SHORT_NAME}.closeConnection`, args => {
-    return closeConnection(args, handlerOptions)
-      .then(result => {
-        server.log(['info', 'connection', pkg.name], 'connection closed');
-        return result;
-      })
-      .catch(error => {
-        server.log(['error', 'connection', pkg.name], error);
-        throw error;
-      });
+    return closeConnection(args, handlerOptions);
   });
 
   server.method(`${SHORT_NAME}.createChannel`, args => {
-    return createChannel(args, handlerOptions)
-      .then(result => {
-        server.log(['info', 'channel', pkg.name], 'channel created');
-        return result;
-      })
-      .catch(error => {
-        server.log(['error', 'channel', pkg.name], error);
-        throw error;
-      });
+    return createChannel(args, handlerOptions);
   });
 
   /* Work queue */
@@ -164,15 +140,7 @@ exports.register = function (server, userOptions, next) {
   });
 
   server.method(`${SHORT_NAME}.addWorker`, args => {
-    return addWorker(args, handlerOptions)
-      .then(result => {
-        server.log(['worker', pkg.name], `worker added ${args.queue}`);
-        return result;
-      })
-      .catch(error => {
-        server.log(['error', 'worker', pkg.name], error);
-        throw error;
-      });
+    return addWorker(args, handlerOptions);
   });
 
   /* PubSub */
@@ -182,15 +150,7 @@ exports.register = function (server, userOptions, next) {
   });
 
   server.method(`${SHORT_NAME}.addSubscriber`, args => {
-    return addSubscriber(args, handlerOptions)
-      .then(result => {
-        server.log(['subscriber', pkg.name], `subscriber added ${args.exchange}`);
-        return result;
-      })
-      .catch(error => {
-        server.log(['error', 'subscriber', pkg.name], error);
-        throw error;
-      });
+    return addSubscriber(args, handlerOptions);
   });
 
   /* Utils */
@@ -204,4 +164,4 @@ exports.register = function (server, userOptions, next) {
   next();
 };
 
-module.exports.register.attributes = {pkg};
+exports.register.attributes = {pkg};
