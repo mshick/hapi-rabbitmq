@@ -1,7 +1,7 @@
 hapi-rabbitmq [![Build Status](https://travis-ci.org/mshick/hapi-rabbitmq.svg?branch=master)](https://travis-ci.org/mshick/hapi-rabbitmq) [![npm version](https://badge.fury.io/js/hapi-rabbitmq.svg)](https://badge.fury.io/js/hapi-rabbitmq)
 ==============
 
-A HAPI server plugin exposing RabbitMQ-backed PubSub and task queue pattern methods from [librabbitmq](https://github.com/librabbitmq/).
+A HAPI server plugin exposing RabbitMQ-backed PubSub and task queue pattern methods from [librabbitmq](https://github.com/mshick/librabbitmq/).
 
 Configuration
 -------------
