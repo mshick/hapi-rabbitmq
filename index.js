@@ -1,4 +1,4 @@
-const defaultsDeep = require('lodash/defaultsDeep');
+const { defaultsDeep } = require('lodash/fp');
 const Ajv = require('ajv');
 const {
   constants,
@@ -76,8 +76,6 @@ const optionsSchema = {
   required: ['url']
 };
 
-const validate = ajv.compile(optionsSchema);
-
 const defaultOptions = {
   preserveChannels: true,
   connection: {
@@ -92,32 +90,37 @@ const defaultOptions = {
   }
 };
 
-exports.register = function (server, userOptions, next) {
-  const options = defaultsDeep({}, userOptions, defaultOptions);
+const register = async (server, userOptions = {}) => {
+  const options = defaultsDeep(defaultOptions, userOptions);
 
-  const isValid = validate(options);
+  const isValid = ajv.validate(optionsSchema, options);
 
   if (!isValid) {
-    return next(validate.errors);
+    server.log([pkg.name, 'error'], ajv.errors);
+    throw new Error('Invalid configuration options.');
   }
 
   server.app[pkg.name] = state;
 
-  const closeAll = () => {
-    if (state.openClients.length) {
-      state.openClients.forEach(c => c.close());
-    }
+  const closeAll = async () => {
+    try {
+      server.log([pkg.name, 'debug'], `closing RabbitMQ connections`);
 
-    return closeConnection().then(() => {
+      if (state.openClients.length) {
+        state.openClients.forEach(c => c.close());
+      }
+
+      await closeConnection();
+
       server.log([pkg.name], 'connections closed');
-    });
+    } catch (error) {
+      server.log([pkg.name, 'error'], error);
+    }
   };
 
-  server.ext('onPreStop', (server, next) => {
-    closeAll().then(() => next()).catch(next);
-  });
+  server.events.on('stop', closeAll);
 
-  const handlerOptions = {options, state, name: pkg.name, server};
+  const handlerOptions = { options, state, name: pkg.name, server };
 
   /* Initialization */
 
@@ -160,8 +163,10 @@ exports.register = function (server, userOptions, next) {
   server.expose('constants', constants);
 
   server.log([pkg.name, 'registered'], 'hapi-rabbitmq registered');
-
-  next();
 };
 
-exports.register.attributes = {pkg};
+exports.plugin = {
+  register,
+  multiple: true,
+  pkg
+};

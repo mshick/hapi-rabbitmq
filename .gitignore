@@ -38,3 +38,6 @@ jspm_packages
 
 # dotenv file
 .env
+
+# Editor files
+.vscode

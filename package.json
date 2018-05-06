@@ -32,18 +32,20 @@
   },
   "homepage": "https://github.com/mshick/hapi-rabbitmq#readme",
   "dependencies": {
-    "ajv": "^5.5.2",
+    "ajv": "^6.4.0",
     "librabbitmq": "^0.7.2",
     "lodash": "^4.17.4"
   },
   "devDependencies": {
-    "ava": "^0.24.0",
+    "ava": "^0.25.0",
     "babel-eslint": "^8.1.2",
-    "dotenv": "^4.0.0",
+    "dotenv": "^5.0.1",
     "eslint": "^4.14.0",
     "eslint-config-parsley": "^1.2.1",
+    "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-filenames": "^1.2.0",
     "eslint-plugin-import": "^2.8.0",
-    "hapi": "16.6.2"
+    "hapi": "^17.4.0",
+    "prettier": "^1.12.1"
   }
 }
