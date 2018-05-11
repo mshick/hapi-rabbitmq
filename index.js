@@ -106,7 +106,7 @@ const register = async (server, userOptions = {}) => {
     try {
       server.log([pkg.name, 'debug'], `closing RabbitMQ connections`);
 
-      if (state.openClients.length) {
+      if (state.openClients && state.openClients.length) {
         state.openClients.forEach(c => c.close());
       }
 
