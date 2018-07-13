@@ -1,6 +1,6 @@
 {
   "name": "hapi-rabbitmq",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "author": "Michael Shick <m@shick.us>",
   "license": "MIT",
   "description": "A HAPI server plugin implementing PubSub and job queue patterns in RabbitMQ with librabbitmq.",
