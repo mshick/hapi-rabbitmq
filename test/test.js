@@ -77,6 +77,7 @@ test('should be able to find the plugin exposed methods', async t => {
     t.truthy(methods.publishMessage);
     t.truthy(methods.addSubscriber);
     t.truthy(methods.getChannelName);
+    t.truthy(methods.assertQueue);
   } catch (err) {
     t.fail(err);
   }

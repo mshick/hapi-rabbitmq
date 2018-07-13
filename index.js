@@ -10,7 +10,8 @@ const {
   publishMessage,
   addWorker,
   pushTask,
-  getChannelName
+  getChannelName,
+  assertQueue
 } = require('librabbitmq');
 const pkg = require('./package.json');
 
@@ -144,6 +145,10 @@ const register = async (server, userOptions = {}) => {
 
   server.method(`${SHORT_NAME}.addWorker`, args => {
     return addWorker(args, handlerOptions);
+  });
+
+  server.method(`${SHORT_NAME}.assertQueue`, args => {
+    return assertQueue(args, handlerOptions);
   });
 
   /* PubSub */
